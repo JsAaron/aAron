@@ -1,5 +1,11 @@
 
-require(['core'], function(Ree) {
-	alert(Ree)
-	// return Ree;
-});
+console.log($("#aaron"))
+
+
+
+
+// require(['core'], function(Ree) {
+
+// 	console.log(  Ree("#aaron")  )
+// 	// return Ree;
+// });
