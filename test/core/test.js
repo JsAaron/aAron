@@ -8,7 +8,9 @@
 
 require(['core'], function(Gee) {
 
-	Gee('#aaron');
+	Gee(function(){
+		
+	})
 
 	// works fine if you pass in the element directly
 	//Ree(document.getElementById('aaron').length);

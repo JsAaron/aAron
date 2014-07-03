@@ -66,15 +66,37 @@ define(function() {
 
 	//扩展静态方法
 	Gee.extend({
-		
+	
+		/**
+		 * 判断是window对象
+		 * @param  {[type]}  obj [description]
+		 * @return {Boolean}     [description]
+		 */
+		isWindow: function( obj ) {
+			return obj != null && obj === obj.window;
+		},
+
+		/**
+		 * 是否为函数
+		 * @return {Boolean} [description]
+		 */
+		isFucntion:function(obj){
+			return Gee.type(obj) === 'function';
+		},
+
 		/**
 		 * 类型判断
 		 * typeof 无法判断函数
 		 * instanceof 在跨iframe下出错
 		 * @return {[type]} [description]
 		 */
-		type: function() {
-
+		type: function(obj) {
+			if (obj == null) {
+				return obj + "";
+			}
+			return typeof obj === "object" || typeof obj === "function" ?
+				class2type[toString.call(obj)] || "object" :
+				typeof obj;
 		},
 
 		/**
@@ -82,8 +104,31 @@ define(function() {
 		 * collection, callback(indexInArray, valueOfElement)
 		 * @return {[type]} [description]
 		 */
-		each:function(){
+		each: function(obj, callback) {
+			var value,
+				i = 0,
+				length = obj.length,
+				//判断是数组
+				isArray = isArraylike(obj);
 
+			if (isArray) {
+				for (; i < length; i++) {
+					value = callback.call(obj[i], i, obj[i]);
+					//回false来终止迭代。返回非false相当于一个循环中的continue语句，
+					//这意味着，它会立即跳出当前的迭代，转到下一个迭代
+					if (value === false) {
+						break;
+					}
+				}
+			} else {
+				for (i in obj) {
+					value = callback.call(obj[i], i, obj[i]);
+					if (value === false) {
+						break;
+					}
+				}
+			}
+			return obj;
 		}
 
 	})
@@ -100,9 +145,10 @@ define(function() {
 	//2 类型
 	function isArraylike(obj) {
 		var length = obj.length,
+			//判断类型
+			//
 			type = Gee.type(obj);
-
-		if (type === "function" || jQuery.isWindow(obj)) {
+		if (type === "function" || Gee.isWindow(obj)) {
 			return false;
 		}
 
@@ -165,7 +211,6 @@ define(function() {
 						}
 						this.context = document;
 						this.selector = selector;
-						console.log(this)
 						return this;
 					}
 				}
@@ -175,6 +220,11 @@ define(function() {
 				this.context = this[0] = selector;
 				this.length = 1;
 				return this;
+
+				//如果是函数
+				//$(fn) ready加载回调
+ 			} else if (Gee.isFucntion(selector)){
+ 				
 			}
 	
 		};
