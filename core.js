@@ -20,11 +20,11 @@ define(function() {
 	}
 
 
-	function Ree(selector, context) {
-		return new Ree.fn.init(selector, context);
+	function Gee(selector, context) {
+		return new Gee.fn.init(selector, context);
 	}
 
-	Ree.fn = Ree.prototype = {
+	Gee.fn = Gee.prototype = {
 
 	}
 
@@ -36,7 +36,7 @@ define(function() {
 	 *  .extend( target [, object1 ] [, objectN ] )
 	 *  .extend( [deep ], target, object1 [, objectN ] )
 	 */
-	Ree.extend = Ree.fn.extend = function() {
+	Gee.extend = Gee.fn.extend = function() {
 		var options, src, copy,
 			target = arguments[0] || {},
 			i = 1,
@@ -65,7 +65,7 @@ define(function() {
 
 
 	//扩展静态方法
-	Ree.extend({
+	Gee.extend({
 		
 		/**
 		 * 类型判断
@@ -90,7 +90,7 @@ define(function() {
 
 
 	//扩充类型判断
-	Ree.each("Boolean Number String Function Array Date RegExp Object Error".split(" "), function(i, name) {
+	Gee.each("Boolean Number String Function Array Date RegExp Object Error".split(" "), function(i, name) {
 		class2type["[object " + name + "]"] = name.toLowerCase();
 	});
 
@@ -100,7 +100,7 @@ define(function() {
 	//2 类型
 	function isArraylike(obj) {
 		var length = obj.length,
-			type = Ree.type(obj);
+			type = Gee.type(obj);
 
 		if (type === "function" || jQuery.isWindow(obj)) {
 			return false;
@@ -141,7 +141,7 @@ define(function() {
 		//	#test
 		rquickExpr = /^(?:\s*(<[\w\W]+>)[^>]*|#([\w-]*))$/,
 
-		init = Ree.fn.init = function(selector, context) {
+		init = Gee.fn.init = function(selector, context) {
 
 			var match,elem;
 
@@ -169,7 +169,7 @@ define(function() {
 						return this;
 					}
 				}
-				//Ree(document)
+				//Gee(document)
 				//初始化DOM节点
 			} else if (selector.nodeType) {
 				this.context = this[0] = selector;
@@ -181,11 +181,11 @@ define(function() {
 
 
 	//静态方法与实例方法共存处理
-	init.prototype = Ree.fn;	
+	init.prototype = Gee.fn;	
 
 	//初始化根节点引用
-	rootjQuery = Ree(document);
+	rootjQuery = Gee(document);
 
 
-	return Ree;
+	return Gee;
 });

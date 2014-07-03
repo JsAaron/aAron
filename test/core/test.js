@@ -6,9 +6,9 @@
 
 
 
-require(['core'], function(Ree) {
+require(['core'], function(Gee) {
 
-	Ree('#aaron');
+	Gee('#aaron');
 
 	// works fine if you pass in the element directly
 	//Ree(document.getElementById('aaron').length);
