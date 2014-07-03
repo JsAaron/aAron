@@ -20,11 +20,11 @@ define(function() {
 	}
 
 
-	function Gee(selector, context) {
-		return new Gee.fn.init(selector, context);
+	function aAron(selector, context) {
+		return new aAron.fn.init(selector, context);
 	}
 
-	Gee.fn = Gee.prototype = {
+	aAron.fn = aAron.prototype = {
 
 	}
 
@@ -36,7 +36,7 @@ define(function() {
 	 *  .extend( target [, object1 ] [, objectN ] )
 	 *  .extend( [deep ], target, object1 [, objectN ] )
 	 */
-	Gee.extend = Gee.fn.extend = function() {
+	aAron.extend = aAron.fn.extend = function() {
 		var options, src, copy,
 			target = arguments[0] || {},
 			i = 1,
@@ -65,7 +65,7 @@ define(function() {
 
 
 	//扩展静态方法
-	Gee.extend({
+	aAron.extend({
 	
 		/**
 		 * 判断是window对象
@@ -81,7 +81,7 @@ define(function() {
 		 * @return {Boolean} [description]
 		 */
 		isFucntion:function(obj){
-			return Gee.type(obj) === 'function';
+			return aAron.type(obj) === 'function';
 		},
 
 		/**
@@ -135,7 +135,7 @@ define(function() {
 
 
 	//扩充类型判断
-	Gee.each("Boolean Number String Function Array Date RegExp Object Error".split(" "), function(i, name) {
+	aAron.each("Boolean Number String Function Array Date RegExp Object Error".split(" "), function(i, name) {
 		class2type["[object " + name + "]"] = name.toLowerCase();
 	});
 
@@ -147,8 +147,8 @@ define(function() {
 		var length = obj.length,
 			//判断类型
 			//
-			type = Gee.type(obj);
-		if (type === "function" || Gee.isWindow(obj)) {
+			type = aAron.type(obj);
+		if (type === "function" || aAron.isWindow(obj)) {
 			return false;
 		}
 
@@ -187,7 +187,7 @@ define(function() {
 		//	#test
 		rquickExpr = /^(?:\s*(<[\w\W]+>)[^>]*|#([\w-]*))$/,
 
-		init = Gee.fn.init = function(selector, context) {
+		init = aAron.fn.init = function(selector, context) {
 
 			var match,elem;
 
@@ -214,7 +214,7 @@ define(function() {
 						return this;
 					}
 				}
-				//Gee(document)
+				//aAron(document)
 				//初始化DOM节点
 			} else if (selector.nodeType) {
 				this.context = this[0] = selector;
@@ -223,7 +223,7 @@ define(function() {
 
 				//如果是函数
 				//$(fn) ready加载回调
- 			} else if (Gee.isFucntion(selector)){
+ 			} else if (aAron.isFucntion(selector)){
  				
 			}
 	
@@ -231,11 +231,11 @@ define(function() {
 
 
 	//静态方法与实例方法共存处理
-	init.prototype = Gee.fn;	
+	init.prototype = aAron.fn;	
 
 	//初始化根节点引用
-	rootjQuery = Gee(document);
+	rootjQuery = aAron(document);
 
 
-	return Gee;
+	return aAron;
 });

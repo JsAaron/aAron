@@ -3,7 +3,7 @@
  * @type {String}
  */
 require.config({
-	baseUrl: '../../'
+	baseUrl: '../'
 });
 
 
