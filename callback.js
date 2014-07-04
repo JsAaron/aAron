@@ -181,31 +181,5 @@ define([
 		return self;
 	}
 
-
-	function fn1(value) {
-		console.log(value);
-	}
-
-
-	function fn2(value) {
-		fn1("fn2 says: " + value);
-		return false;
-	}
-
-
-var callbacks = aAron.Callbacks( "memory" );
-
-callbacks.add( fn1 );
-callbacks.fire( "foo" );
-
-callbacks.add( fn2 );
-callbacks.fire( "bar" );
-
-callbacks.remove( fn2 );
-callbacks.fire( "foobar" );
-
-
-
-
 	return aAron
 })
