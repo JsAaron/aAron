@@ -88,6 +88,14 @@ define(function() {
 		},
 
 		/**
+		 * 判断是否存在数组中
+		 * @return {[type]} [description]
+		 */
+		inArray: function(elem, arr, i) {
+			return arr == null ? -1 : indexOf.call(arr, elem, i);
+		},
+
+		/**
 		 * 类型判断
 		 * typeof 无法判断函数
 		 * instanceof 在跨iframe下出错

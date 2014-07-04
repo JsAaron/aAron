@@ -15,8 +15,8 @@ define([
 	"./core"
 ], function(aAron) {
 
-	//用户缓存参数
-	var optionsCache;
+	//缓存用户参数, 只计算一次
+	var optionsCache = {};
 
 	function createOptions(options) {
 		var object = optionsCache[options] = {};
@@ -44,6 +44,10 @@ define([
 	 * 	memory: 保持以前的值，将添加到这个列表的后面的最新的值立即执行调用任何回调 (像一个递延 Deferred).
 	 * 	unique: 确保一次只能添加一个回调(所以在列表中没有重复的回调).
 	 *  stopOnFalse: 当一个回调返回false 时中断调用
+	 *
+	 *	无参数的：正常的队列处理处理,通过add增加,通过fire全部执行
+	 * 	实现once的思路：只执行一次fire,之后的add全部都抛弃
+	 * 
 	 */
 	aAron.Callbacks = function(options) {
 
@@ -53,48 +57,114 @@ define([
 		//存放回调函数
 		var list = [];
 
+		//是否记忆
+		var memory;
+
+		//第一次回触发(通过add和fireWith内部使用)
+		var firingStart;
+
+		//只执行一次
+		//在一次执行的时候调用disable清理所有
+		var once = options.once;
+
 		/**
 		 * 内部处理list
 		 * @return {[type]} [description]
 		 */
 		function _fire(data){
+			//特殊的处理，只有在第一次执行过fire的时候才会赋值
+			//用于记忆的处理,缓存上一次操作的数据
+			//在下次add的时候就会调用了
+			memory = options.memory && data;
+
 			//执行回调的数量
-			var firingIndex  = 0;
+			//因为记忆的关系,需要取到最后一个索引
+			//当作触发的开始
+			//通过firingStart
+			firingIndex = firingStart || 0;
+
+			//复位
+			firingStart = 0;
+
 			var firingLength = list.length;
 			for (; list && firingIndex < firingLength; firingIndex++) {
 				//触发所有的回调,并且传递对应的上下文与参数
 				list[firingIndex].apply(data[0], data[1])
 			}
+
+			//如果配置只执行一次
+			if (list) {
+				if (once) {
+					self.disable();
+				}
+			}
+
 		}
 
 		//提供外面调用的接口
 		var self = {
+
 			/**
 			 * 增加一个回调函数
 			 */
 			add: function() {
-				//入队列
+				if (list) {
+					//取出开始的长度,用户缓存记忆调出最后一个
+					var start = list.length;
+
+					//入队列
+					aAron.each(arguments, function(_, arg) {
+						var type = aAron.type(arg);
+						if (type === "function") {
+							list.push(arg);
+						}
+					});
+
+					//如果选择了记忆
+					if (memory) {
+						//记录下需要记忆处理的索引位置
+						firingStart = start;
+						_fire(memory);
+					}
+				}
+			},
+
+			/**
+			 * 在回调列表中移除指定的回调函数
+			 * 通过indexOf找到索引名
+			 */
+			remove: function() {
+				//删除指定fn名
 				aAron.each(arguments, function(_, arg) {
-					var type = aAron.type(arg);
-					if (type === "function") {
-						list.push(arg);
+					var index;
+					//假如能找到这个索引的位置
+					while ((index = aAron.inArray(arg, list, index)) > -1) {
+						list.splice(index, 1); //删除这个队列
 					}
 				});
 			},
-			remove: function() {
 
+			/**
+			 * 清除列表
+			 * 针对once的处理,只调用一次
+			 * @return {[type]} [description]
+			 */
+			disable:function(){
+				list = undefined;
+				return this;
 			},
-
 
 			/**
 			 * 传入触发的指定上下文
 			 * @return {[type]} [description]
 			 */
 			fireWith: function(context, args) {
-				args = args || [];
-				//合并参数
-				args = [context, args.slice ? args.slice() : args];
-				_fire(args);
+				if(list){
+					args = args || [];
+					//合并参数
+					args = [context, args.slice ? args.slice() : args];
+					_fire(args);					
+				}
 				return this;
 			},
 
@@ -112,7 +182,6 @@ define([
 	}
 
 
-
 	function fn1(value) {
 		console.log(value);
 	}
@@ -122,14 +191,19 @@ define([
 		fn1("fn2 says: " + value);
 		return false;
 	}
-		
 
-	var callbacks = aAron.Callbacks();
 
-	callbacks.add(fn1);
-	callbacks.fire( "foo!" );
-	callbacks.add(fn2);
-	callbacks.fire( "2222!" );
+var callbacks = aAron.Callbacks( "memory" );
+
+callbacks.add( fn1 );
+callbacks.fire( "foo" );
+
+callbacks.add( fn2 );
+callbacks.fire( "bar" );
+
+callbacks.remove( fn2 );
+callbacks.fire( "foobar" );
+
 
 
 
