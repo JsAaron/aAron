@@ -12,6 +12,7 @@ define(function() {
 	var emptyObject = {};
 	var toString    = emptyObject.toString;
 	var hasOwn      = emptyObject.hasOwnProperty;
+	var rnotwhite   =  (/\S+/g); //匹配空格
 
 	var document = window.document;
 
@@ -66,7 +67,9 @@ define(function() {
 
 	//扩展静态方法
 	aAron.extend({
-	
+		
+		rnotwhite:rnotwhite,
+
 		/**
 		 * 判断是window对象
 		 * @param  {[type]}  obj [description]
