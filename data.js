@@ -48,18 +48,26 @@ define([
 
 	}
 
+	/**
+	 * 设置对象的缓存
+	 * @param {[type]} owner [description]
+	 * @param {[type]} data  [description]
+	 * @param {[type]} value [description]
+	 */
+	dataProto.set = function(owner, data, value) {
+		var prop,
+			// There may be an unlock assigned to this node,
+			// if there is no entry for this "owner", create one inline
+			// and set the unlock as though an owner entry had always existed
+			unlock = this.key(owner),
+			cache = this.cache[unlock];
 
-	dataProto.set = function(){
-
-		
 	}
-
 
 	dataProto.get = function(){
 
 		
 	}
-
 
 
 	//内部使用的缓存
@@ -107,7 +115,10 @@ define([
 					//background-color => backgroundColor
 					camelKey = aAron.camelCase(key);
 
-				console.log(camelKey)
+				//设置数据缓存
+				this.each(function() {
+					data_user.set(this, camelKey, value);
+				});
 
 			}, null, value)
 		}

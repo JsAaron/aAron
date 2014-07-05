@@ -19,6 +19,16 @@ define(function() {
 	//版本号
 	var version = "@VERSION";
 
+
+	//用于匹配camelCase转化器规则
+	var rmsPrefix = /^-ms-/,
+		rdashAlpha = /-([\da-z])/gi,
+		//camelCase的回调函数,转化大写开头
+		fcamelCase = function(all, letter) {
+			return letter.toUpperCase();
+		};
+
+
 	var class2type = {
 
 	}
@@ -29,6 +39,13 @@ define(function() {
 	}
 
 	aAron.fn = aAron.prototype = {
+
+		/**
+		 * 实例的遍历方法
+		 */
+		each: function(callback, args) {
+			return aAron.each(this, callback, args);
+		}
 
 	}
 
@@ -103,12 +120,15 @@ define(function() {
 		/**
 		 * 驼峰转化
 		 * 转换连字符式的字符串为驼峰式，用于CSS模块和数据缓存模块
+		 * 先用正则rmsPrefix匹配前缀“-ms-”，如果有则修正为“ms-”；
+		 * 然后用正则rdashAlpha匹配连字符“-”和其后的第一个字母或数字，
+		 * 并用字符串方法replace()和函数fcamelCase()把匹配部分替换为对应的大写字母或数字。
 		 * aAron.camelCase( 'background-color' );
 		 * background-color => backgroundColor
 		 * @return {[type]} [description]
 		 */
 		camelCase:function(string){
-			return string;
+			return string.replace( rmsPrefix, "ms-" ).replace( rdashAlpha, fcamelCase );
 		},
 
 		/**
