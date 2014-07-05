@@ -1,7 +1,8 @@
 //=======================================
 //
-//		数据缓存
-//
+//	数据缓存:
+//		方法允许我们在DOM元素上绑定任意类型的数据,避免了循环引用的内存泄漏风险。
+//		
 //=======================================
 define([
 	"./core"
@@ -10,7 +11,7 @@ define([
 	/**
 	 * 确保是一个对象有数据
 	 */
-	jQuery.acceptData = function( owner ) {
+	aAron.acceptData = function( owner ) {
 		//只接受几种类型
 		//元素节点
 		//文档节点
@@ -58,7 +59,6 @@ define([
 
 
 
-
 	//内部使用的缓存
 	var data_priv = new Data();
 
@@ -67,4 +67,27 @@ define([
 
 	console.log(data_user)
 
+
+	/**
+	 * 扩展静态方法
+	 */
+	aAron.extend({
+		data:function(){
+
+		}
+	});
+
+
+	/**
+	 * 扩展实例方法
+	 */
+	aAron.fn.extend({
+		data:function(){
+
+		}
+	});
+
+
+
+	return aAron;
 })
