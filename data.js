@@ -96,14 +96,18 @@ define([
 
 			//如果是get,取值操作
 			if(value === undefined){
-				
+
 			}
 
 			//set操作
 			//抽象出access参数解析方法
 			access(this, function(value) {
+				var data,
+					//转化key正确
+					//background-color => backgroundColor
+					camelKey = aAron.camelCase(key);
 
-				console.log(value)
+				console.log(camelKey)
 
 			}, null, value)
 		}

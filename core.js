@@ -101,6 +101,17 @@ define(function() {
 		},
 
 		/**
+		 * 驼峰转化
+		 * 转换连字符式的字符串为驼峰式，用于CSS模块和数据缓存模块
+		 * aAron.camelCase( 'background-color' );
+		 * background-color => backgroundColor
+		 * @return {[type]} [description]
+		 */
+		camelCase:function(string){
+			return string;
+		},
+
+		/**
 		 * 类型判断
 		 * typeof 无法判断函数
 		 * instanceof 在跨iframe下出错
