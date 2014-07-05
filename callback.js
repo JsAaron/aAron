@@ -18,6 +18,14 @@ define([
 	//缓存用户参数, 只计算一次
 	var optionsCache = {};
 
+
+	/**
+	 * option(once/menory)
+	 * 		=>option.once = true
+	 * 		=>option.menory = true
+	 * @param  {[type]} options [description]
+	 * @return {[type]}         [description]
+	 */
 	function createOptions(options) {
 		var object = optionsCache[options] = {};
 		aAron.each(options.match(aAron.rnotwhite) || [], function(_, flag) {
@@ -183,3 +191,5 @@ define([
 
 	return aAron
 })
+
+

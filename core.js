@@ -16,6 +16,9 @@ define(function() {
 
 	var document = window.document;
 
+	//版本号
+	var version = "@VERSION";
+
 	var class2type = {
 
 	}
@@ -68,6 +71,8 @@ define(function() {
 	//扩展静态方法
 	aAron.extend({
 		
+		expando: "aAron" + (version + Math.random()).replace(/\D/g, ""),
+
 		rnotwhite:rnotwhite,
 
 		/**
