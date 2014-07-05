@@ -1,12 +1,15 @@
-//=======================================
+//====================================================
 //
 //	数据缓存:
-//		方法允许我们在DOM元素上绑定任意类型的数据,避免了循环引用的内存泄漏风险。
+//		方法允许我们在DOM元素上绑定任意类型的数据,
+//		避免了循环引用的内存泄漏风险。
 //		
-//=======================================
+//=====================================================
 define([
-	"./core"
-], function(aAron) {
+	"./core",
+	//引入参数access方法
+	"./core/access"
+],function(aAron, access) {
 
 	/**
 	 * 确保是一个对象有数据
@@ -82,8 +85,27 @@ define([
 	 * 扩展实例方法
 	 */
 	aAron.fn.extend({
-		data:function(){
+		/*
+		 * set/get同接口
+		 * 通过传递参数不同区分
+		 */
+		data: function(key, value) {
+			var i, name, data,
+				elem = this[0],
+				attrs = elem && elem.attributes;
 
+			//如果是get,取值操作
+			if(value === undefined){
+				
+			}
+
+			//set操作
+			//抽象出access参数解析方法
+			access(this, function(value) {
+
+				console.log(value)
+
+			}, null, value)
 		}
 	});
 

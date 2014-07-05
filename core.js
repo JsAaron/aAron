@@ -88,7 +88,7 @@ define(function() {
 		 * 是否为函数
 		 * @return {Boolean} [description]
 		 */
-		isFucntion:function(obj){
+		isFunction:function(obj){
 			return aAron.type(obj) === 'function';
 		},
 
@@ -239,7 +239,7 @@ define(function() {
 
 				//如果是函数
 				//$(fn) ready加载回调
- 			} else if (aAron.isFucntion(selector)){
+ 			} else if (aAron.isFunction(selector)){
  				
 			}
 	
