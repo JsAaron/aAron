@@ -14,14 +14,14 @@ define([
 	var access = aAaron.access = function(elems, fn, key, value, raw) {
 		var i = 0,
 			len = elems.length,
+			//判断是set/get
 			bulk = key == null; 
 
+		//sets操作
 		//如果key是对象数据
 		if (aAaron.type(key) === 'object') {
-
-
+			alert('access-如果key是对象数据')
 			return 1111
-
 			//如果只是单个值
 		} else if (value !== undefined) {
 
@@ -38,6 +38,10 @@ define([
 			} 
 		}
 
+		//如果是gets操作
+		if (bulk) {
+			return fn && fn.call(elems)
+		}
 	};
 
 	return access;

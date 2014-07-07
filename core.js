@@ -93,6 +93,20 @@ define(function() {
 		rnotwhite:rnotwhite,
 
 		/**
+		 * 是否为空对象
+		 * 如果对象能循环则为false
+		 * 否则为true
+		 * @return {Boolean} [description]
+		 */
+		isEmptyObject: function(obj) {
+			var name;
+			for (name in obj) {
+				return false;
+			}
+			return true;
+		},
+
+		/**
 		 * 判断是window对象
 		 * @param  {[type]}  obj [description]
 		 * @return {Boolean}     [description]

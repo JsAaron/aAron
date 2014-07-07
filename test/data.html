@@ -10,20 +10,24 @@
 			require(['data'], function(aAron) {
 			
 				var aaron = aAron('#aaron')
-				
-				aaron.data('background-color', {
-					aaa: 1,
-					bbb: 2
-				})
+						
+				//设置值		
+				aaron.data("foo", 52);
 
-				aaron.data('background-color', {
-					cccc: 1333,
-					dddd: 2444
-				})
+				//带key对象
+				aaron.data("bar", {
+					myType: "test",
+					count: 40
+				});
 
+				//直接对象
+				aaron.data({
+					baz: [1, 2, 3]
+				});
+				 
+				//取值
+				console.log( aaron.data() )
 
-				// works fine if you pass in the element directly
-				//Ree(document.getElementById('aaron').length);
 
 			});
 

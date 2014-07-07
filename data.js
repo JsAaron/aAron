@@ -109,7 +109,22 @@ define([
 		if (typeof data === "string") {
 			cache[data] = value;
 		} else {
-			alert('数据缓存set,对象未处理')
+			//====================================
+			// 直接传递对象,设置多个值的处理
+			// .data({
+			// 		myType : "test",
+			// 		count  : 40
+			// });
+			// ===================================
+			// 
+			if (aAron.isEmptyObject(cache)) {
+				aAron.extend(this.cache[unlock], data);
+			} else {
+				// 否则,一个接一个的属性复制到缓存对象
+				for (prop in data) {
+					cache[prop] = data[prop];
+				}
+			}
 		}
 		return cache;
 	}
@@ -156,18 +171,46 @@ define([
 				elem = this[0],
 				attrs = elem && elem.attributes;
 
-			//如果是get,取值操作
-			if(value === undefined){
+			//获取所有的缓存对象
+			if(key === undefined){
 
+				
+				return
+			}
+
+			//如果key是直接对象,则设置多个值缓存
+			if (typeof key === "object") {
+				return this.each(function() {
+					data_user.set(this, key);
+				});
 			}
 
 			//set操作
 			//抽象出access参数解析方法
-			access(this, function(value) {
+			return access(this, function(value) {
 				var data,
 					//转化key正确
 					//background-color => backgroundColor
 					camelKey = aAron.camelCase(key);
+
+				//get操作
+				if ( elem && value === undefined ) {
+
+					//如果缓存中的值,取到则返回
+					data = data_user.get(elem, key);
+					if (data !== undefined) {
+						return data;
+					}
+
+					//如果key是backgournd-size命名
+					//则取转换的key
+					data = data_user.get( elem, camelKey );
+					if ( data !== undefined ) {
+						return data;
+					}
+
+					return
+				}
 
 				//设置数据缓存
 				this.each(function() {
