@@ -14,7 +14,7 @@ define([
 	/**
 	 * 确保是一个对象有数据
 	 */
-	aAron.acceptData = function( owner ) {
+	var acceptData = aAron.acceptData = function( owner ) {
 		//只接受几种类型
 		//元素节点
 		//文档节点
@@ -40,43 +40,97 @@ define([
 	//生成唯一的UUID
 	Data.uid = 1;
 
+
 	var dataProto = Data.prototype;
 
 
-	dataProto.key = function(){
+	dataProto.key = function(owner) {
+		//如果不是一个对象或者节点
+		if (!acceptData(owner)) {
+			return 0;
+		}
 
+		//建立内部对象
+		var descriptor = {},
+			//检测对象是否有锁定标志
+			unlock = owner[ this.expando ];
 
+		//如果没有,则创建
+		if ( !unlock ) {
+			unlock = Data.uid++;
+			//通过ES5的设置,让这个值不能被改写
+			try {
+				descriptor[this.expando] = {
+					value: unlock
+				};
+				Object.defineProperties(owner, descriptor);
+			} catch (e) {
+				//低版本兼容处理
+				descriptor[this.expando] = unlock;
+				aAron.extend(owner, descriptor);
+			}
+		}
+
+		//确保缓存中存在这个对象
+		if ( !this.cache[ unlock ] ) {
+			this.cache[ unlock ] = {};
+		}
+
+		return unlock;
 	}
 
 	/**
 	 * 设置对象的缓存
+	 * 保存的格式
+	 * cache {
+	 * 	 1:{
+	 * 	 	backgroundSize:{
+	 * 	 		a:1,
+	 * 	 		b:2
+	 * 	 	}
+	 * 	 }
+	 * }
+	 * 
 	 * @param {[type]} owner [description]
 	 * @param {[type]} data  [description]
 	 * @param {[type]} value [description]
 	 */
 	dataProto.set = function(owner, data, value) {
 		var prop,
-			// There may be an unlock assigned to this node,
-			// if there is no entry for this "owner", create one inline
-			// and set the unlock as though an owner entry had always existed
+			//分配给这个节点,可能有一个解锁
+			//如果没有则内部创建
 			unlock = this.key(owner),
+			//找到缓存容器对象
 			cache = this.cache[unlock];
 
+		//如果是key字符串,直接缓存
+		//这里存在一个问题
+		//对相同的接口做不同的处理不会累计,都会直接覆盖
+		if (typeof data === "string") {
+			cache[data] = value;
+		} else {
+			alert('数据缓存set,对象未处理')
+		}
+		return cache;
 	}
 
-	dataProto.get = function(){
-
-		
+	/**
+	 * 从缓存中取值数据
+	 * @return {[type]}       [description]
+	 */
+	dataProto.get = function(owner, key) {
+		var cache = this.cache[this.key(owner)];
+		return key === undefined ?
+			cache : cache[key];
 	}
 
 
 	//内部使用的缓存
 	var data_priv = new Data();
 
+
 	//用户使用的缓存
 	var data_user = new Data();
-
-	console.log(data_user)
 
 
 	/**

@@ -11,7 +11,16 @@
 			
 				var aaron = aAron('#aaron')
 				
-					aaron.data('background-color',1235)
+				aaron.data('background-color', {
+					aaa: 1,
+					bbb: 2
+				})
+
+				aaron.data('background-color', {
+					cccc: 1333,
+					dddd: 2444
+				})
+
 
 				// works fine if you pass in the element directly
 				//Ree(document.getElementById('aaron').length);
