@@ -75,6 +75,10 @@ define([
 		//在一次执行的时候调用disable清理所有
 		var once = options.once;
 
+		//只要不是做一次处理
+		//做一个hack标记
+		var stack = !options.once && [];
+
 		/**
 		 * 内部处理list
 		 * @return {[type]} [description]
@@ -100,9 +104,14 @@ define([
 				list[firingIndex].apply(data[0], data[1])
 			}
 
-			//如果配置只执行一次
-			if (list) {
-				if (once) {
+			if ( list ) {
+				if ( stack ) { 
+					if ( stack.length ) {
+						fire( stack.shift() );
+					}
+				} else if ( memory ) {//如果设置了记忆
+					list = [];
+				} else { //如果配置只执行一次
 					self.disable();
 				}
 			}
@@ -158,7 +167,20 @@ define([
 			 * @return {[type]} [description]
 			 */
 			disable:function(){
-				list = undefined;
+				list = stack = undefined;
+				return this;
+			},
+
+			/**
+			 * 加锁
+			 * 锁列表的当前状态
+			 * @return {[type]} [description]
+			 */
+			lock:function(){
+				stack = undefined;
+				if ( !memory ) {
+					self.disable();
+				}
 				return this;
 			},
 
@@ -183,7 +205,7 @@ define([
 			fire: function() {
 				self.fireWith(this, arguments);
 				return this;
-			},
+			}
 		}
 
 		return self;
