@@ -35,14 +35,30 @@ define([
 
 				},
 				then: function() {
-
+					
 				},
-				promise: function() {
-
+				/**
+				 * 让对象继承promise方法
+				 * 这里的方法只能是可读的
+				 * @param  {[type]} obj [description]
+				 * @return {[type]}     [description]
+				 */
+				promise: function( obj ) {
+					return obj != null ? aAron.extend( obj, promise ) : promise;
 				}
 			};
 
+			//添加管道队列
+			//就是回调的值提供给下一个回调使用
+			promise.pipe = promise.then;
 
+			//返回的对象
+			var deferred = {};
+
+			/**
+			 * 通过分解tuples做各种匹配动作
+			 * 针对成功与失败,注册了三个函数处理
+			 */
 			aAron.each(tuples, function(i, tuple) {
 				//获取回调对象
 				var list = tuple[2],
@@ -61,14 +77,28 @@ define([
 					}, tuples[i ^ 1][2].disable, tuples[2][2].lock);
 				}
 
-
-
+				//生成deferred对象需要的返回
+				// deferred[ resolve | reject | notify ]
+				deferred[tuple[0]] = function() {
+					deferred[tuple[0] + "With"](this === deferred ? promise : this, arguments);
+					return this;
+				};
+				//允许传入上下文
+				// deferred[ resolveWith | rejectWith | notifyWith]
+				deferred[ tuple[0] + "With" ] = list.fireWith;
 			});
 
-			console.log(promise)
+			// 生成一个deferred的promise
+			// deferred 本身只有 6个方法
+			// 通过promise接口混入promise方法
+			promise.promise( deferred );
 
+			//如果开始就传递了一个函数回调
+			if ( func ) {
+				func.call( deferred, deferred );
+			}
 
-
+			return deferred;
 		},
 
 		when: function() {
@@ -76,8 +106,6 @@ define([
 		}
 
 	})
-
-
 
 	return aAron;
 });

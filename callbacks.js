@@ -121,6 +121,9 @@ define([
 		//提供外面调用的接口
 		var self = {
 
+			//队列的长队
+			length: 0,
+
 			/**
 			 * 增加一个回调函数
 			 */
@@ -143,7 +146,11 @@ define([
 						firingStart = start;
 						_fire(memory);
 					}
+
+					self.length = list.length;
 				}
+
+				return this;
 			},
 
 			/**
@@ -159,6 +166,8 @@ define([
 						list.splice(index, 1); //删除这个队列
 					}
 				});
+				self.length = list.length;
+				return this;
 			},
 
 			/**

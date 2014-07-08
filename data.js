@@ -146,16 +146,21 @@ define([
 	//用户使用的缓存
 	var data_user = new Data();
 
-
 	/**
 	 * 扩展静态方法
 	 */
 	aAron.extend({
+
+		exportData:function(){
+			return data_user
+		},
+
 		data:function(){
 
 		}
 	});
 
+	console.log(aAron.exportData)
 
 	/**
 	 * 扩展实例方法
