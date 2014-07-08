@@ -133,12 +133,19 @@ define([
 					var start = list.length;
 
 					//入队列
-					aAron.each(arguments, function(_, arg) {
-						var type = aAron.type(arg);
-						if (type === "function") {
-							list.push(arg);
-						}
-					});
+					//用()()的写法是为产生add自己的命名空间
+					//让[object]情况下可以递归
+					(function add(args) {
+						aAron.each(args, function(_, arg) {
+							var type = aAron.type(arg);
+							if (type === "function") {
+								list.push(arg);
+								//[object]情况,需要递归
+							} else if (arg && arg.length && type !== "string") {
+								add(arg);
+							}
+						});
+					})(arguments);
 
 					//如果选择了记忆
 					if (memory) {

@@ -1,4 +1,4 @@
-//===================================
+//=========================================================================================================
 //		
 //	步队列
 //	延迟对象，在jQuery的1.5引入，是通过调用jQuery.Deferred()方法创建一个可链式调用的工具对象。 
@@ -7,7 +7,24 @@
 //	创建一个Deferred（延迟）对象后，你可以通过使用下面任何方法 直接从对象创建或者链式调用 或 保存对象的一个变量，
 //	调用该变量的一个或多个方法。
 //		
-//===================================
+//		
+//	内部构建3条线
+//	
+//	1 成功线
+//			 done回调->resolve 改变状态为resolved
+//			 
+//	2 失败线
+//			 fail回到->reject  改变状态为rejected
+//			 
+//	3 状态线
+//	
+//	
+//	巧妙的设计：
+//		在第一次执行done的时候内部执行了list
+//		在更改状态的时候,fire触发了,memory也就成立了,那么证明这条链是已经被触发过的
+//		后续的done在加入的时候,检测到memory也就会立即执行了
+//			
+//=========================================================================================================
 define([
 	"./core",
 	"./callbacks"
@@ -22,17 +39,27 @@ define([
 
 			var tuples = [
 				// 添加成功, 失败,变化侦听器
+				// 分别为3个回调控制
 				["resolve", "done", aAron.Callbacks("once memory"), "resolved"],
 				["reject", "fail", aAron.Callbacks("once memory"), "rejected"],
 				["notify", "progress", aAron.Callbacks("memory")]
 			];
 
 			var promise = {
+				/**
+				 * 查询状态
+				 * @return {[type]} [description]
+				 */
 				state: function() {
-
+					return state;
 				},
+				/**
+				 * 失败或者成功都会调用到
+				 * @return {[type]} [description]
+				 */
 				always: function() {
-
+					deferred.done( arguments ).fail( arguments );
+					return this;
 				},
 				then: function() {
 					
@@ -68,10 +95,19 @@ define([
 				promise[ tuple[1] ] = list.add;
 
 				if (stateString) {
-					//注册成功后处理
+					//内部注册成功/失败后处理
 					//1 resolved或者rejected后修正状态
 					//2 [ reject_list | resolve_list ].disable
 					//3 progress_list.lock
+					//	
+					//执行三条中的任意一条线路，针对剩余2条线的处理
+					//
+					//tuples[i ^ 1][2].disable 反向处理
+					//如果成功执行了,就清理失败,反之亦然
+					//	
+					//tuples[2][2].lock
+					//notify的处理
+					//	
 					list.add(function() {
 						state = stateString;
 					}, tuples[i ^ 1][2].disable, tuples[2][2].lock);
