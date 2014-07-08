@@ -46,6 +46,7 @@ define([
 			];
 
 			var promise = {
+
 				/**
 				 * 查询状态
 				 * @return {[type]} [description]
@@ -53,6 +54,7 @@ define([
 				state: function() {
 					return state;
 				},
+
 				/**
 				 * 失败或者成功都会调用到
 				 * @return {[type]} [description]
@@ -61,9 +63,15 @@ define([
 					deferred.done( arguments ).fail( arguments );
 					return this;
 				},
+
+				/**
+				 * 当Deferred（延迟）对象解决，拒绝或仍在进行中时，调用添加处理程序。
+				 * @return {[type]} [description]
+				 */
 				then: function() {
-					
+						
 				},
+
 				/**
 				 * 让对象继承promise方法
 				 * 这里的方法只能是可读的
@@ -73,6 +81,7 @@ define([
 				promise: function( obj ) {
 					return obj != null ? aAron.extend( obj, promise ) : promise;
 				}
+				
 			};
 
 			//添加管道队列

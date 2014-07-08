@@ -13,11 +13,11 @@
 
 				dfd.resolve(2)
 
-				dfd.always(function(aa) {
+				dfd.then(function(aa) {
 					console.log(aa)
 					return aa * 2
 				})
-
+				
 
 			});
 
