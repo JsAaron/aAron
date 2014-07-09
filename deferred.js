@@ -67,9 +67,22 @@ define([
 				/**
 				 * 当Deferred（延迟）对象解决，拒绝或仍在进行中时，调用添加处理程序。
 				 * @return {[type]} [description]
+				 * then实现了pipe的管道,回调使用瀑布模型
+				 * 提供成功，失败，进度3个回调的处理
 				 */
-				then: function() {
-						
+				then: function( /* fnDone, fnFail, fnProgress */ ) {
+					var fns = arguments;
+					return aAron.Deferred(function( newDefer ) {
+						aAron.each( tuples, function( i, tuple ) {
+							var fn = aAron.isFunction(fns[i]) && fns[i];
+							// deferred[ done | fail | progress ] for forwarding actions to newDefer
+							deferred[tuple[1]](function() {
+								var returned = fn && fn.apply(this, arguments);
+								newDefer[tuple[0] + "With"](this === promise ? newDefer.promise() : this, fn ? [returned] : arguments);
+							});
+						});
+						fns = null;
+					}).promise();
 				},
 
 				/**

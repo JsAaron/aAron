@@ -11,13 +11,15 @@
 				
 				var dfd = aAron.Deferred();
 
-				dfd.resolve(2)
-
 				dfd.then(function(aa) {
 					console.log(aa)
 					return aa * 2
+				}).then(function(aa) {
+					console.log(aa)
+					return aa * 2
 				})
-				
+
+				dfd.resolve(2)
 
 			});
 
