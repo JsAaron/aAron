@@ -4,9 +4,9 @@
 //	1 html
 //	2 xml
 //=================================
-define(["./core"],function(aAron) {
+define(["./core"], function(aAron) {
 
-	var Sizzle = (function(window){
+	var Sizzle = (function(window) {
 
 		var support,
 			isXML,
@@ -19,9 +19,33 @@ define(["./core"],function(aAron) {
 		/**
 		 * 选择器入口
 		 */
-		function Sizzle(){
+		function Sizzle() {
 
 		}
+
+
+		/**
+		 * 做功能测试,直接操作元素节点特性判断
+		 * @param {Function} 
+		 */
+		function assert(fn) {
+			var div = document.createElement("div");
+			try {
+				//!!一般用来将后面的表达式强制转换为布尔类型的数据（boolean），
+				//!也就是只能是true或者false
+				return !!fn(div);
+			} catch (e) {
+				return false;
+			} finally {
+				// 移除这个测试的节点
+				if (div.parentNode) {
+					div.parentNode.removeChild(div);
+				}
+				//针对ie释放内存
+				div = null;
+			}
+		}
+
 
 		//=====================================================
 		//
@@ -61,13 +85,32 @@ define(["./core"],function(aAron) {
 			documentIsHTML = !isXML(doc);
 
 
+			//Support: IE>8
+			//iframe的处理
 
+			/**
+			 * 针对属性的处理
+			 * 确认getAttribute真的返回属性而不是属性(除了IE8布尔值)
+			 * @param  {[type]} div [description]
+			 * @return {[type]}     [description]
+			 */
+			support.attributes = assert(function( div ) {
+				div.className = "i"; //设置一个属性
+				return !div.getAttribute("className");
+			});
 
+			/**
+			 * getElementsByTagName() 方法可返回带有指定标签名的对象的集合。
+			 * @param  {[type]} div [description]
+			 * @return {[type]}     [description]
+			 */
+			support.getElementsByTagName = assert(function( div ) {
+				div.appendChild( doc.createComment("") );
+				return !div.getElementsByTagName("*").length;
+			});
 
 
 		};
-
-
 
 
 
