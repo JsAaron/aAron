@@ -2,7 +2,7 @@
  * 核心模块
  * @return {[type]} [description]
  */
-define(function() {
+define(function(sizzle) {
 
 	var emptyArray  = [];
 	var slice       = emptyArray.slice;
@@ -222,6 +222,16 @@ define(function() {
 	}
 
 
+	aAron.fn.extend({
+		/**
+		 * sizzle的刷选接口
+		 * @return {[type]} [description]
+		 */
+		find:function(){
+
+		}
+	})
+
 
 	//根节点引用
 	var rootjQuery,
@@ -274,7 +284,13 @@ define(function() {
 						this.selector = selector;
 						return this;
 					}
+				}else{
+
+
+
 				}
+
+
 				//aAron(document)
 				//初始化DOM节点
 			} else if (selector.nodeType) {
