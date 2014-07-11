@@ -25,7 +25,16 @@ define(["./core"], function(aAron) {
 			//排序
 			sortOrder,
 
+			tokenize,
+			select,
+
 			preferredDoc = window.document,
+
+			//缓存
+			classCache    = createCache(),
+			//分词缓存
+			tokenCache    = createCache(),
+			compilerCache = createCache(),
 
 			//实例方法
 			hasOwn      = ({}).hasOwnProperty,
@@ -37,6 +46,9 @@ define(["./core"], function(aAron) {
 
 		var expando = "sizzle" + -(new Date());
 		var rnative = /^[^{]+\{\s*\[native \w/;
+		var rcomma  = new RegExp("^" + whitespace + "*," + whitespace + "*");
+		var rcombinators = new RegExp("^" + whitespace + "*([>+~]|" + whitespace + ")" + whitespace + "*");
+
 
 
 		//做push的处理，push支不支持Nodelist
@@ -80,21 +92,128 @@ define(["./core"], function(aAron) {
 
 
 		/**
+		 * 创建键值有限大小的缓存
+		 * @returns {Function(string, Object)} Returns the Object data after storing it on itself with
+		 *	property name the (space-suffixed) string and (if the cache is larger than Expr.cacheLength)
+		 *	deleting the oldest entry
+		 */
+
+		function createCache() {
+			var keys = [];
+
+			function cache(key, value) {
+				// Use (key + " ") to avoid collision with native prototype properties (see Issue #157)
+				if (keys.push(key + " ") > Expr.cacheLength) {
+					// Only keep the most recent entries
+					delete cache[keys.shift()];
+				}
+				return (cache[key + " "] = value);
+			}
+			return cache;
+		}
+
+
+		/**
 		 * 选择器的表达式
 		 * @type {[type]}
 		 */
 		Expr = Sizzle.selectors = {
 
+			//缓存量度
+			cacheLength: 50,
+
 			find: {},
+
+			/**
+			 * 用来对捕获组进行预处理
+			 * @type {Object}
+			 */
+			preFilter: {
+				"ATTR": function(match) {
+					match[1] = match[1].replace(runescape, funescape);
+
+					// Move the given value to match[3] whether quoted or unquoted
+					match[3] = (match[3] || match[4] || match[5] || "").replace(runescape, funescape);
+
+					if (match[2] === "~=") {
+						match[3] = " " + match[3] + " ";
+					}
+
+					return match.slice(0, 4);
+				},
+
+				"CHILD": function(match) {
+					/* matches from matchExpr["CHILD"]
+					1 type (only|nth|...)
+					2 what (child|of-type)
+					3 argument (even|odd|\d*|\d*n([+-]\d+)?|...)
+					4 xn-component of xn+y argument ([+-]?\d*n|)
+					5 sign of xn-component
+					6 x of xn-component
+					7 sign of y-component
+					8 y of y-component
+				*/
+					match[1] = match[1].toLowerCase();
+
+					if (match[1].slice(0, 3) === "nth") {
+						// nth-* requires argument
+						if (!match[3]) {
+							Sizzle.error(match[0]);
+						}
+
+						// numeric x and y parameters for Expr.filter.CHILD
+						// remember that false/true cast respectively to 0/1
+						match[4] = +(match[4] ? match[5] + (match[6] || 1) : 2 * (match[3] === "even" || match[3] === "odd"));
+						match[5] = +((match[7] + match[8]) || match[3] === "odd");
+
+						// other types prohibit arguments
+					} else if (match[3]) {
+						Sizzle.error(match[0]);
+					}
+
+					return match;
+				},
+
+				"PSEUDO": function(match) {
+					var excess,
+						unquoted = !match[6] && match[2];
+
+					if (matchExpr["CHILD"].test(match[0])) {
+						return null;
+					}
+
+					// Accept quoted arguments as-is
+					if (match[3]) {
+						match[2] = match[4] || match[5] || "";
+
+						// Strip excess characters from unquoted arguments
+					} else if (unquoted && rpseudo.test(unquoted) &&
+						// Get excess from tokenize (recursively)
+						(excess = tokenize(unquoted, true)) &&
+						// advance to the next closing parenthesis
+						(excess = unquoted.indexOf(")", unquoted.length - excess) - unquoted.length)) {
+
+						// excess is a negative index
+						match[0] = match[0].slice(0, excess);
+						match[2] = unquoted.slice(0, excess);
+					}
+
+					// Return only captures needed by the pseudo filter method (type and argument)
+					return match.slice(0, 3);
+				}
+			},
 
 			filter: function() {
 
 			}
+
+
 		}
 
 
 
 		/**
+		 * 断言,测试函数
 		 * 做功能测试,直接操作元素节点特性判断
 		 * 通过创建一个div元素，检测被传入的fn是否被当前浏览器支持
 		 * @param {Function} 
@@ -494,6 +613,96 @@ define(["./core"], function(aAron) {
 
 			return doc;
 		};
+
+
+		//以后遇到这种工具函数，先拷到外面看输入输出
+		//当tokenize第二个参数为true时，仅仅返回处理的结果长度
+		tokenize = Sizzle.tokenize = function(selector, parseOnly) {
+			var matched, match, tokens, type,
+				soFar, groups, preFilters,
+				cached = tokenCache[selector + " "];
+
+			if (cached) {
+				return parseOnly ? 0 : cached.slice(0);
+			}
+
+			//soFar用来存切割剩下的selector
+			soFar = selector;
+			groups = [];
+			preFilters = Expr.preFilter;
+
+			while (soFar) {
+
+				// Comma and first run
+		        //原本这里的写法是!matched || (match = rcomma.exec( soFar )
+		        //这里的写法应该换一下，换成(match = rcomma.exec( soFar ) || !matched
+		        //否则$(',body',document.documentElement)这样的写法会报错
+				if (!matched || (match = rcomma.exec(soFar))) {
+					if (match) {
+						// Don't consume trailing commas as valid
+						soFar = soFar.slice(match[0].length) || soFar;
+					}
+					groups.push((tokens = []));
+				}
+
+				matched = false;
+
+				// Combinators
+				if ((match = rcombinators.exec(soFar))) {
+					matched = match.shift();
+					tokens.push({
+						value: matched,
+						// Cast descendant combinators to space
+						type: match[0].replace(rtrim, " ")
+					});
+					soFar = soFar.slice(matched.length);
+				}
+
+				// Filters
+				for (type in Expr.filter) {
+					if ((match = matchExpr[type].exec(soFar)) && (!preFilters[type] ||
+						(match = preFilters[type](match)))) {
+						matched = match.shift();
+						tokens.push({
+							value: matched,
+							type: type,
+							matches: match
+						});
+						soFar = soFar.slice(matched.length);
+					}
+				}
+
+				if (!matched) {
+					break;
+				}
+			}
+
+			// Return the length of the invalid excess
+			// if we're just parsing
+			// Otherwise, throw an error or return tokens
+			return parseOnly ?
+				soFar.length :
+				soFar ?
+				Sizzle.error(selector) :
+			// Cache the tokens
+			tokenCache(selector, groups).slice(0);
+		};
+
+
+		/**
+		 * sizzle 内置算法
+		 */
+		select = Sizzle.select = function(selector, context, results, seed) {
+			var i, tokens, token, type, find,
+				compiled = typeof selector === "function" && selector,
+				match = !seed && tokenize((selector = compiled.selector || selector));
+
+			
+
+		};
+
+
+
 
 
 		//初始化兼容处理
