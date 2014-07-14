@@ -23,10 +23,36 @@
 	<script type="text/javascript">
 		
 			require(['./sizzle'], function(aAron) {
-				
-					
-				
-				
+
+					var whitespace = "[\\x20\\t\\r\\n\\f]";
+					var rcomma = new RegExp( "^" + whitespace + "*," + whitespace + "*" )
+							
+					///^#((?:\\.|[\w-] | [^\x00-\xa0] ) +)/
+					var characterEncoding = "(?:\\\\.|[\\w-]|[^\\x00-\\xa0])+";
+					var ID = new RegExp("^#(" + characterEncoding + ")")
+
+					///^((?:\\.|[\w*-]|[^\x00-\xa0])+)/
+					var TAG =  new RegExp( "^(" + characterEncoding.replace( "w", "w*" ) + ")" );
+								
+					var Class = new RegExp( "^\\.(" + characterEncoding + ")" );
+
+					var attributes = "\\[" + whitespace + "*(" + characterEncoding + ")(?:" + whitespace +
+						// Operator (capture 2)
+						"*([*^$|!~]?=)" + whitespace +
+						// "Attribute values must be CSS identifiers [capture 5] or strings [capture 3 or capture 4]"
+						"*(?:'((?:\\\\.|[^\\\\'])*)'|\"((?:\\\\.|[^\\\\\"])*)\"|(" + identifier + "))|)" + whitespace +
+						"*\\]",
+
+					var ATTR = new RegExp( "^" + attributes );
+
+
+					console.log(Class.exec(".li > sadf.da dsf")) 
+
+
+
+
+
+
 
 			});
 
