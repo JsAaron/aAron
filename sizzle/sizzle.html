@@ -36,17 +36,17 @@
 								
 					var Class = new RegExp( "^\\.(" + characterEncoding + ")" );
 
+					var identifier = characterEncoding.replace( "w", "w#" );
 					var attributes = "\\[" + whitespace + "*(" + characterEncoding + ")(?:" + whitespace +
 						// Operator (capture 2)
 						"*([*^$|!~]?=)" + whitespace +
 						// "Attribute values must be CSS identifiers [capture 5] or strings [capture 3 or capture 4]"
 						"*(?:'((?:\\\\.|[^\\\\'])*)'|\"((?:\\\\.|[^\\\\\"])*)\"|(" + identifier + "))|)" + whitespace +
-						"*\\]",
+						"*\\]";
 
 					var ATTR = new RegExp( "^" + attributes );
 
-
-					console.log(Class.exec(".li > sadf.da dsf")) 
+					console.log(ATTR.exec("[name*='man']")) 
 
 
 
