@@ -19,7 +19,6 @@ define(function(sizzle) {
 	//版本号
 	var version = "@VERSION";
 
-
 	//用于匹配camelCase转化器规则
 	var rmsPrefix = /^-ms-/,
 		rdashAlpha = /-([\da-z])/gi,
@@ -289,8 +288,6 @@ define(function(sizzle) {
 
 
 				}
-
-
 				//aAron(document)
 				//初始化DOM节点
 			} else if (selector.nodeType) {
